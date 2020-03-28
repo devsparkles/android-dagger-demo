@@ -23,7 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.android.dagger.MyApplication
 import com.example.android.dagger.R
 import com.example.android.dagger.login.LoginActivity
-import com.example.android.dagger.user.UserManager
+import com.example.android.dagger.registration.RegistrationActivity
 import javax.inject.Inject
 
 class SettingsActivity : AppCompatActivity() {
@@ -31,12 +31,21 @@ class SettingsActivity : AppCompatActivity() {
     @Inject
     lateinit var settingsViewModel: SettingsViewModel
 
-    @Inject
-    lateinit var userManager: UserManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        (application as MyApplication).appComponent.userComponent().create().inject(this)
+        val userManager = (application as MyApplication).appComponent.userManager()
+        if (userManager.userComponent == null) {
+            // logout - go back to login
+            if (!userManager.isUserRegistered()) {
+                startActivity(Intent(this, RegistrationActivity::class.java))
+                finish()
+            } else {
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
+            }
+        } else {
+            userManager.userComponent!!.inject(this)
+        }
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)

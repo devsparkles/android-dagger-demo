@@ -26,15 +26,10 @@ import com.example.android.dagger.R
 import com.example.android.dagger.login.LoginActivity
 import com.example.android.dagger.registration.RegistrationActivity
 import com.example.android.dagger.settings.SettingsActivity
-import com.example.android.dagger.user.UserManager
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-
-    // @Inject annotated fields will be provided by Dagger
-    @Inject
-    lateinit var userManager: UserManager
 
     @Inject
     lateinit var mainViewModel: MainViewModel
@@ -46,10 +41,8 @@ class MainActivity : AppCompatActivity() {
      * else carry on with MainActivity
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        (application as MyApplication).appComponent.userComponent().create().inject(this)
-
         super.onCreate(savedInstanceState)
+        val userManager = (application as MyApplication).appComponent.userManager()
 
         if (!userManager.isUserLoggedIn()) {
             if (!userManager.isUserRegistered()) {
@@ -61,7 +54,7 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             setContentView(R.layout.activity_main)
-
+            userManager.userComponent!!.inject(this)
             setupViews()
         }
     }
