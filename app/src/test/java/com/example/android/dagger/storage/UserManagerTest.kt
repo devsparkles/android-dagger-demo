@@ -16,22 +16,33 @@
 
 package com.example.android.dagger.storage
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.android.dagger.user.UserComponent
 import com.example.android.dagger.user.UserManager
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito
+import org.mockito.Mockito.mock
 
 class UserManagerTest {
+
+
+    // Executes each task synchronously using Architecture Components.
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var storage: Storage
     private lateinit var userManager: UserManager
 
     @Before
     fun setup() {
+        val userComponentFactory = mock(UserComponent.Factory::class.java)
+        val userComponent = mock(UserComponent::class.java)
+        Mockito.`when`(userComponentFactory.create()).thenReturn(userComponent)
         storage = FakeStorage()
-        userManager = UserManager(storage)
+        userManager = UserManager(storage, userComponentFactory)
     }
 
     @Test
@@ -98,6 +109,7 @@ class UserManagerTest {
         assertTrue(userManager.isUserLoggedIn())
 
         userManager.unregister()
+
         assertFalse(userManager.isUserLoggedIn())
         assertFalse(userManager.isUserRegistered())
     }

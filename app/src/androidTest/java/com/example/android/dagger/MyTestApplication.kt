@@ -16,12 +16,18 @@
 
 package com.example.android.dagger
 
-import com.example.android.dagger.storage.FakeStorage
-import com.example.android.dagger.user.UserManager
+import com.example.android.dagger.di.AppComponent
+import com.example.android.dagger.di.DaggerAppComponent
 
 class MyTestApplication : MyApplication() {
 
-    override val userManager by lazy {
-        UserManager(FakeStorage())
+    // Instance of the AppComponent that will be used by all the Activities in the project
+    val appComponentTest: AppComponent by lazy {
+        // Creates an instance of AppComponent using its Factory constructor
+        // We pass the applicationContext that will be used as Context in the graph
+
+
+        DaggerAppComponent.factory().create(applicationContext)
     }
+
 }
